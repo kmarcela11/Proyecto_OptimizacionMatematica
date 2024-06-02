@@ -164,7 +164,7 @@ def opti(valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_
 
     # Resolver el problema
 
-    problema.solve()
+    problema.solve(PULP_CBC_CMD(msg=False))
 
     # Resultados
     valores = []
@@ -183,20 +183,24 @@ def graficas(nombres, valores):
     fig.add_trace(go.Bar(x=nombres, y=valores, name='Datos de ejemplo'))
 
     fig.update_layout(
-    title='Diagrama de barras con Plotly',
-    xaxis_title='Categorías',
-    yaxis_title='Valores'   
+    xaxis_title='Tipos de crudo',
+    yaxis_title='Cantidades de barriles'   
     )
-
     return fig
+
+def graficas2(nombres, valores):
+    fig2 = go.Figure()
+    fig2.add_trace(go.Bar(x=nombres, y=valores, name='Datos de ejemplo'))
+
+    fig2.update_layout(
+    yaxis_title='Doláres invertidos en publicidad',
+    xaxis_title='Tipo de gasolina'   
+    )
+    return fig2
+
 
 # Definir el diseño de la página 1
 pagina_1_layout = html.Div([
-    # Encabezado
-    html.Div([
-        html.H1("Página 1", style={'color': 'blue', 'font-size': '48px', 'margin-bottom': '0px'}),
-    ], style={'text-align': 'left'}),
-    
     # Pregunta 1
     html.Div([
         html.H2("Digite la cantidad de tipos de gasolina que su empresa produce:", style={'margin-top': '20px'}),
@@ -211,13 +215,13 @@ pagina_1_layout = html.Div([
     
     # Pregunta 3
     html.Div([
-        html.H2("¿Cuál es la cantidad máxima de compra de barriles por día de su empresa?", style={'margin-top': '20px'}),
+        html.H2("¿Cuál es la cantidad máxima de compra de barriles de petróleo crudo por día de su empresa?", style={'margin-top': '20px'}),
         dcc.Input(id='input-max-compra-barriles', type='number', placeholder='Ingrese la cantidad', min=0),
     ], style={'margin-top': '20px'}),
     
     # Pregunta 4
     html.Div([
-        html.H2("¿Cuánto cuesta transformar un barril de crudo a gasolina? (Dólares)", style={'margin-top': '20px'}),
+        html.H2("¿Cuánto cuesta transformar un barril de petróleo crudo a gasolina? (Dólares)", style={'margin-top': '20px'}),
         dcc.Input(id='input-costo-transformacion', type='number', placeholder='Ingrese el costo', min=0),
     ], style={'margin-top': '20px'}),
     
@@ -229,7 +233,7 @@ pagina_1_layout = html.Div([
     
     # Pregunta 6
     html.Div([
-        html.H2("Si invierte un dólar en publicidad, ¿en cuántos barriles aumenta la demanda de gasolina?", style={'margin-top': '20px'}),
+        html.H2("Si su empresa invierte un dólar en publicidad, ¿En cuántos barriles aumenta la demanda de gasolina?",style={'margin-top': '20px'}),
         dcc.Input(id='input-publicidad', type='number', placeholder='Ingrese la cantidad', min=0),
     ], style={'margin-top': '20px'}),
     
@@ -241,10 +245,6 @@ pagina_1_layout = html.Div([
 
 # Definir el diseño de la página 2
 pagina_2_layout = html.Div([
-    # Encabezado
-    html.Div([
-        html.H1("Página 2", style={'color': 'blue', 'font-size': '48px', 'margin-bottom': '0px'}),
-    ], style={'text-align': 'left'}),
     
     # Contenido de la página 2
     html.Div([
@@ -258,7 +258,7 @@ pagina_2_layout = html.Div([
 
     # Botón "Enviar"
     html.Div([
-        html.Button('Optimizar', id='btn-enviar-datos', n_clicks=0, style={'margin-top': '20px', 'padding': '10px 20px'}),
+        html.Button('Enviar', id='btn-enviar-datos', n_clicks=0, style={'margin-top': '20px', 'padding': '10px 20px'}),
     ]),
 
     # Contenedor para las gráficas
@@ -282,8 +282,8 @@ app.layout = html.Div([
 
     # Selector de páginas
     dcc.Tabs(id='tabs', value='pagina-1', children=[
-        dcc.Tab(label='Página 1', value='pagina-1'),
-        dcc.Tab(label='Página 2', value='pagina-2'),
+        dcc.Tab(label='Datos iniciales', value='pagina-1'),
+        dcc.Tab(label='Tablas/Resultados', value='pagina-2'),
     ]),
     
     # Contenedor para mostrar el contenido de la página seleccionada
@@ -295,6 +295,7 @@ app.layout = html.Div([
     Output('page-content', 'children'),
     [Input('tabs', 'value')]
 )
+# Se encarga de mostrar la página correcta. 
 def display_page(tab):
     if tab == 'pagina-1':
         return pagina_1_layout
@@ -326,6 +327,7 @@ def store_cantidad_gasolina_y_crudo(n_clicks, cantidad_gasolina, cantidad_crudo)
     Input('store-cantidad-gasolina', 'data'),
     Input('store-cantidad-crudo', 'data')
 )
+# Función para generar las tablas de la página 2
 def generar_tablas_pagina_2(data_gasolina, data_crudo):
     if data_gasolina and data_crudo:
         cantidad_gasolina = data_gasolina
@@ -338,7 +340,7 @@ def generar_tablas_pagina_2(data_gasolina, data_crudo):
     return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
 
-#Callback para hacer el proceso de optimzacion y crear las graficas
+#Callback para hacer el proceso de optimzacion y crear las gráficas
 @app.callback(
     Output('graficas-container', 'children'),
     [Input('btn-enviar-datos', 'n_clicks')],
@@ -353,17 +355,12 @@ def generar_tablas_pagina_2(data_gasolina, data_crudo):
     State('store-cantidad-crudo', 'data'),
     State('store-restricciones', 'data'),]
 )
+
+# Función que realiza los procesos principales de optimización y gráficas
+
 def store_valores(n_clicks, valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_oc, azufre_cru, cantidad_gasolina, cantidad_crudo, restricciones):
     if n_clicks > 0:
-        precios_gasolina = valores_precios_gasolina
-        precios_barril = precio_b
-        cantidad_barriles = cantidad_b
-        min_octano = min_oc
-        max_azufre = max_az
-        indice_octano = indice_oc
-        azufre_crudo = azufre_cru
         nombres, valores, optimo = opti(valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_oc, azufre_cru, cantidad_gasolina, cantidad_crudo, restricciones)
-        #grafico = graficas(nombres, valores)
         graficos =[]
         for j in range(1, cantidad_gasolina+1):
             nombres_grafica = []
@@ -375,7 +372,7 @@ def store_valores(n_clicks, valores_precios_gasolina, precio_b, cantidad_b, min_
             # Utilizar un identificador único para cada gráfica
             graph_id = f'grafica-{i}'
             graph = dcc.Graph(id=graph_id, figure=graficas(nombres_grafica, valores_grafica))
-            graficos.append(html.Div([html.H3(f'Gráfica Gasolina{j+1}'), graph]))
+            graficos.append(html.Div([html.H3(f'Gráfica gasolina tipo {j}'), graph]))
         
         nombres_grafica2 = []
         valores_grafica2 = []
@@ -385,7 +382,7 @@ def store_valores(n_clicks, valores_precios_gasolina, precio_b, cantidad_b, min_
                 valores_grafica2.append(valores[indice])
 
         graph_id = f'grafica-{cantidad_gasolina+1}'
-        graph = dcc.Graph(id=graph_id, figure=graficas(nombres_grafica2, valores_grafica2))
+        graph = dcc.Graph(id=graph_id, figure=graficas2(nombres_grafica2, valores_grafica2))
         graficos.append(html.Div([html.H3(f'Gráfica Publicidad'), graph]))
 
         graficos.append(html.Div([html.H3(f'El valor de la función objetivo en el óptimo es: {optimo}')]))
@@ -405,11 +402,16 @@ def store_valores(n_clicks, valores_precios_gasolina, precio_b, cantidad_b, min_
      State('input-max-produccion-gasolina', 'value'),
      State('input-publicidad', 'value')]
 )
+
+# Validación de que ya se hayan digitados todos los valores para poder pasar a la página 2.
+
 def cambiar_pagina(n_clicks, cantidad_gasolina, cantidad_crudo, max_compra_barriles, costo_transformacion, max_produccion_gasolina, publicidad):
     if n_clicks > 0 and cantidad_gasolina is not None and cantidad_crudo is not None and max_compra_barriles is not None and costo_transformacion is not None and max_produccion_gasolina is not None and publicidad is not None:
         rests = [max_compra_barriles, costo_transformacion, max_produccion_gasolina, publicidad]
         return 'pagina-2', rests
     return dash.no_update, dash.no_update
 
+# Ejecutar la aplicación
+
 if __name__ == '__main__':
-    app.run_server(debug = True)
+    app.run_server(debug = True) # Debug = True: la aplicación se recargará automáticamente cuando se hagan cambios en el código fuente.
