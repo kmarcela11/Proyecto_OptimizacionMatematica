@@ -180,11 +180,11 @@ def opti(valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_
     
 def graficas(nombres, valores):
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=nombres, y=valores, name='Datos de ejemplo'))
+    fig.add_trace(go.Bar(x=nombres, y=valores, name='Datos de ejemplo', marker_color='lightblue',  # Cambiar el color de las barras
+        width=0.5))
 
-    fig.update_layout(
-    xaxis_title='Tipos de crudo',
-    yaxis_title='Cantidades de barriles'   
+    fig.update_layout(xaxis_title='Tipos de crudo', 
+                      yaxis_title='Cantidades de barriles'  ,  bargap=0.2  
     )
     return fig
 
@@ -262,7 +262,8 @@ pagina_2_layout = html.Div([
     ]),
 
     # Contenedor para las gráficas
-    html.Div(id='graficas-container')
+    #html.Div(id='graficas-container')
+    html.Div( id='graficas-container')
 ])
 
 
