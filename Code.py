@@ -6,6 +6,8 @@ from dash import ALL, MATCH
 from pulp import *
 import plotly.graph_objects as go
 
+# Proyecto 
+
 # Crear la aplicación Dash
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
@@ -254,7 +256,9 @@ pagina_2_layout = html.Div([
         html.Table(id='tabla-indice-octano-azufre'),
         html.Table(id='tabla-gasolina-octano-azufre'),
         html.Table(id='tabla-cantidad-crudo'),
-    ], style={'margin-top': '20px'}),
+    ], style={'margin-top': '20px'
+    
+    }),
 
     # Botón "Enviar"
     html.Div([
