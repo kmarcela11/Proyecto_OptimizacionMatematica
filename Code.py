@@ -1,86 +1,39 @@
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output, State
-from dash import ALL, MATCH
+from dash import dcc, html
+from dash.dependencies import Input, Output, State, ALL
+import dash_bootstrap_components as dbc
 from pulp import *
 import plotly.graph_objects as go
 
-# Proyecto 
 
 # Crear la aplicación Dash
-app = dash.Dash(__name__, suppress_callback_exceptions=True)
+app = dash.Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.FLATLY])
 
-# Estilo CSS para las tablas
-tabla_style = {
-    'borderCollapse': 'collapse',
-    'width': '100%',
-    'border': '1px solid #ddd',
-    'textAlign': 'left',
-}
-
-cabecera_style = {
-    'border': '1px solid #ddd',
-    'padding': '8px',
-    'backgroundColor': '#f2f2f2',
-}
-
-celda_style = {
-    'border': '1px solid #ddd',
-    'padding': '8px',
-}
-
-# Funciones para generar las tablas
 def generar_tabla_gasolina(cantidad_gasolina):
-    header = [
-        html.Tr([html.Th("Tipo de gasolina", style=cabecera_style), html.Th("Precio de venta por barril.", style=cabecera_style)])
-    ]
-    rows = [
-        html.Tr([html.Td(f"Tipo {i+1}", style=celda_style), html.Td(dcc.Input(id={'type': 'precio-gasolina', 'index': i+1}, type='number', placeholder='Ingrese el precio', min = 0), style=celda_style)])
-        for i in range(cantidad_gasolina)
-    ]
-    return html.Table(header + rows, style=tabla_style)
+    header = [html.Tr([html.Th("Tipo de gasolina"), html.Th("Precio de venta por barril")])]
+    rows = [html.Tr([html.Td(f"Tipo {i+1}"), html.Td(dcc.Input(id={'type': 'precio-gasolina', 'index': i+1}, type='number', placeholder='Ingrese el precio', min=0))]) for i in range(cantidad_gasolina)]
+    return dbc.Table(header + rows, bordered=True, hover=True, responsive=True, className="mb-4", style={"border": "2px solid black","text-align": "center"})  # Aquí se establece la altura fija
 
 def generar_tabla_crudo(cantidad_crudo):
-    header = [
-        html.Tr([html.Th("Crudo", style=cabecera_style), html.Th("Precio de compra por barril.", style=cabecera_style)])
-    ]
-    rows = [
-        html.Tr([html.Td(f"Tipo {i+1}", style=celda_style), html.Td(dcc.Input(id={'type': 'precio-crudo', 'index': i+1}, type='number', placeholder='Ingrese el precio', min = 0 ), style=celda_style)])
-        for i in range(cantidad_crudo)
-    ]
-    return html.Table(header + rows, style=tabla_style)
+    header = [html.Tr([html.Th("Tipo  de   Crudo"), html.Th("Precio   de   compra   por barril")])]
+    rows = [html.Tr([html.Td(f"Tipo {i+1}"), html.Td(dcc.Input(id={'type': 'precio-crudo', 'index': i+1}, type='number', placeholder='Ingrese el precio', min=0))]) for i in range(cantidad_crudo)]
+    return dbc.Table(header + rows, bordered=True, hover=True, responsive=True, className="mb-4", style={"border": "2px solid black", "text-align": "center"})  # Aquí se establece la altura fija
 
 def generar_tablag(cantidad_gasolina):
-    header = [
-        html.Tr([html.Th("Tipo de gasolina", style=cabecera_style), html.Th("Cantidad de barriles diarios", style=cabecera_style)])
-    ]
-    rows = [
-        html.Tr([html.Td(f"Tipo {i+1}", style=celda_style), html.Td(dcc.Input(id={'type': 'cantidad-barriles', 'index': i+1}, type='number', placeholder='Ingrese la cantidad de barriles', min = 0), style=celda_style)])
-        for i in range(cantidad_gasolina)]
-    return html.Table(header + rows, style=tabla_style)
+    header = [html.Tr([html.Th("Tipo de gasolina"), html.Th("Cantidad de barriles diarios")])]
+    rows = [html.Tr([html.Td(f"Tipo {i+1}"), html.Td(dcc.Input(id={'type': 'cantidad-barriles', 'index': i+1}, type='number', placeholder='Número de barriles ', min=0))]) for i in range(cantidad_gasolina)]
+    return dbc.Table(header + rows, bordered=True, hover=True, responsive=True, className="mb-4", style={"border": "2px solid black", "text-align": "center"})
 
 def generar_tabla_gasolina_octano_azufre(cantidad_gasolina):
-    header = [
-        html.Tr([html.Th("Tipo de gasolina", style=cabecera_style), html.Th("Índice mínimo de octano", style=cabecera_style), html.Th("Porcentaje máximo de azufre", style=cabecera_style)])
-    ]
-    rows = [
-        html.Tr([html.Td(f"Tipo {i+1}", style=celda_style), html.Td(dcc.Input(id={'type': 'min-octano', 'index': i+1}, type='number', placeholder='Ingrese el índice mínimo' , min = 0), style=celda_style), 
-                 html.Td(dcc.Input(id={'type': 'max-azufre', 'index': i+1}, type='number', placeholder='Ingrese el porcentaje máximo', min = 0), style=celda_style)])
-        for i in range(cantidad_gasolina)
-    ]
-    return html.Table(header + rows, style=tabla_style)
+    header = [html.Tr([html.Th("Tipo de gasolina"), html.Th("Índice mínimo de octano"), html.Th("Porcentaje máximo de azufre")])]
+    rows = [html.Tr([html.Td(f"Tipo {i+1}"), html.Td(dcc.Input(id={'type': 'min-octano', 'index': i+1}, type='number', placeholder='Índice mínimo', min=0)), html.Td(dcc.Input(id={'type': 'max-azufre', 'index': i+1}, type='number', placeholder='Porcentaje máximo', min=0))]) for i in range(cantidad_gasolina)]
+    return dbc.Table(header + rows, bordered=True, hover=True, responsive=True, className="mb-4", style={"border": "2px solid black", "text-align": "center"})
 
 def generar_tabla_crudo_caracteristicas(cantidad_crudo):
-    header = [
-        html.Tr([html.Th("Crudo", style=cabecera_style), html.Th("Índice de octano", style=cabecera_style), html.Th("Azufre (%)", style=cabecera_style)])
-    ]
-    rows = [
-        html.Tr([html.Td(f"Tipo {i+1}", style=celda_style), html.Td(dcc.Input(id={'type': 'indice-octano', 'index': i+1}, type='number', placeholder='Ingrese el índice de octano', min = 0), style=celda_style),
-                  html.Td(dcc.Input(id={'type': 'porcentaje-azufre', 'index': i+1}, type='number', placeholder='Ingrese el porcentaje de azufre', min  = 0), style=celda_style)])
-        for i in range(cantidad_crudo)
-    ]
-    return html.Table(header + rows, style=tabla_style)
+    header = [html.Tr([html.Th("Tipo de  Crudo"), html.Th("Índice de octano"), html.Th("Azufre (%)")])]
+    rows = [html.Tr([html.Td(f"Tipo {i+1}"), html.Td(dcc.Input(id={'type': 'indice-octano', 'index': i+1}, type='number', placeholder='índice de octano', min=0)), html.Td(dcc.Input(id={'type': 'porcentaje-azufre', 'index': i+1}, type='number', placeholder='Porcentaje de azufre', min=0))]) for i in range(cantidad_crudo)]
+    return dbc.Table(header + rows, bordered=True, hover=True, responsive=True, className="mb-4", style={"border": "2px solid black", "text-align": "center"})
+
 
 def opti(valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_oc, azufre_cru, cantidad_gasolina, cantidad_crudo, restricciones):
     print(valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_oc, azufre_cru, cantidad_gasolina, cantidad_crudo, restricciones)
@@ -186,7 +139,7 @@ def graficas(nombres, valores):
         width=0.5))
 
     fig.update_layout(xaxis_title='Tipos de crudo', 
-                      yaxis_title='Cantidades de barriles'  ,  bargap=0.2  
+                      yaxis_title='Cantidades de barriles'  ,  bargap=0.2 
     )
     return fig
 
@@ -201,172 +154,178 @@ def graficas2(nombres, valores):
     return fig2
 
 
-# Definir el diseño de la página 1
-pagina_1_layout = html.Div([
-    # Pregunta 1
-    html.Div([
-        html.H2("Digite la cantidad de tipos de gasolina que su empresa produce:", style={'margin-top': '20px'}),
-        dcc.Input(id='input-cantidad-gasolina', type='number', placeholder='Ingrese la cantidad', min=1, max=5),
-    ], style={'margin-top': '20px'}),
-    
-    # Pregunta 2
-    html.Div([
-        html.H2("Digite la cantidad de crudo que usa su empresa para producir cada tipo de gasolina:", style={'margin-top': '20px'}),
-        dcc.Input(id='input-cantidad-crudo', type='number', placeholder='Ingrese la cantidad', min=1, max=5),
-    ], style={'margin-top': '20px'}),
-    
-    # Pregunta 3
-    html.Div([
-        html.H2("¿Cuál es la cantidad máxima de compra de barriles de petróleo crudo por día de su empresa?", style={'margin-top': '20px'}),
-        dcc.Input(id='input-max-compra-barriles', type='number', placeholder='Ingrese la cantidad', min=0),
-    ], style={'margin-top': '20px'}),
-    
-    # Pregunta 4
-    html.Div([
-        html.H2("¿Cuánto cuesta transformar un barril de petróleo crudo a gasolina? (Dólares)", style={'margin-top': '20px'}),
-        dcc.Input(id='input-costo-transformacion', type='number', placeholder='Ingrese el costo', min=0),
-    ], style={'margin-top': '20px'}),
-    
-    # Pregunta 5
-    html.Div([
-        html.H2("¿Cuál es la cantidad máxima de barriles de gasolina que puede producir diariamente?", style={'margin-top': '20px'}),
-        dcc.Input(id='input-max-produccion-gasolina', type='number', placeholder='Ingrese la cantidad', min=0),
-    ], style={'margin-top': '20px'}),
-    
-    # Pregunta 6
-    html.Div([
-        html.H2("Si su empresa invierte un dólar en publicidad, ¿En cuántos barriles aumenta la demanda de gasolina?",style={'margin-top': '20px'}),
-        dcc.Input(id='input-publicidad', type='number', placeholder='Ingrese la cantidad', min=0),
-    ], style={'margin-top': '20px'}),
-    
-    # Botón "Siguiente
-    html.Div([
-        html.Button('Siguiente', id='btn-siguiente', n_clicks=0, style={'margin-top': '20px', 'padding': '10px 20px'}),
-    ]),
+# the style arguments for the sidebar. We use position:fixed and a fixed width
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "11rem",
+    "padding": "2rem 1rem",
+    "background-color": "#212f3d",
+}
+
+# the styles for the main content position it to the right of the sidebar and
+# add some padding.
+CONTENT_STYLE = {
+    "margin-left": "18rem",
+    "margin-right": "2rem",
+    "padding": "2rem 1rem",
+}
+
+# Estilo para el pie de página
+FOOTER_STYLE = {
+    "position": "fixed",
+    "bottom": 0,
+    "left": 0,
+    "width": "100%",
+    "padding": "1rem",
+    "background-color": "#212f3d",
+    "color": "white",
+    "text-align": "center",
+}
+
+sidebar = html.Div(
+    [
+        html.H3("BLENDEK", className="display-20", style={"color": "white"}),
+        html.Hr(style={"borderTop": "1px solid white"}),
+        dbc.Nav(
+            [
+                dbc.NavLink("Datos", href="/", active="exact"),
+                dbc.NavLink("Resultados", href="/page-1", active="exact"),
+            ],
+            vertical=True,
+            pills=True,
+        ),
+         # Contenido del pie de página
+        html.Footer("© 2024 Blendek Inc.", style=FOOTER_STYLE)
+    ],
+    style=SIDEBAR_STYLE,
+)
+
+content = html.Div(id="page-content", style=CONTENT_STYLE)
+
+app.layout = html.Div([dcc.Store(id='grafs'),
+    dcc.Location(id="url"), sidebar, content])
+
+introducir_datos_layout = html.Div([
+    dbc.Container([
+        dbc.Row([
+            dbc.Col(html.H1("OPTIMIZACIÓN DE BLENDING"), className="text-center")
+        ]),
+        dbc.Row([
+            dbc.Col(html.H4("Seleccione la cantidad de:"), className="mb-2")
+        ]),
+        dbc.Row([
+            dbc.Col([
+                html.H5('Tipos de gasolina'),
+                dcc.Slider(id='cantidad-gasolina', min=1, max=5, step=1, value=3, marks={i: str(i) for i in range(1, 6)})
+            ], width=6),
+            dbc.Col([
+                html.H5('Tipos de crudo'),
+                dcc.Slider(id='cantidad-crudo', min=1, max=5, step=1, value=3, marks={i: str(i) for i in range(1, 6)})
+            ], width=6)
+        ]),
+        dbc.Row([
+            dbc.Col(html.Div(id='tablas-precio-crudo', children=[])),
+            dbc.Col(html.Div(id='tablas-precio-gasolina', children=[])),
+            dbc.Col(html.Div(id='tablas-cantidad-gasolina', children=[])),
+        ], className="mb-4"),
+
+        dbc.Row([
+            dbc.Col(html.Div(id='tablas-caracteristicas-gasolina', children=[])),
+            dbc.Col(html.Div(id='tablas-caracteristicas-crudo', children=[]))
+        ], className="mb-2"),
+        dbc.Row([
+            html.H6("¿Cuál es la cantidad máxima de compra de barriles de petróleo crudo por día de su empresa?", style={'margin-top': '20px'}),
+                dcc.Input(id='input-max-compra-barriles', type='number', placeholder='Ingrese la cantidad', min=0)
+        ]), 
+        dbc.Row([
+            html.H6("¿Cuánto cuesta transformar un barril de petróleo crudo a gasolina? (Dólares)", style={'margin-top': '20px'}),
+                 dcc.Input(id='input-costo-transformacion', type='number', placeholder='Ingrese el costo', min=0)
+        ]), 
+        dbc.Row([
+            html.H6("¿Cuál es la cantidad máxima de barriles de gasolina que puede producir diariamente?", style={'margin-top': '20px'}),
+                dcc.Input(id='input-max-produccion-gasolina', type='number', placeholder='Ingrese la cantidad', min=0)
+        ]), 
+        dbc.Row([
+            html.H6("Si su empresa invierte un dólar en publicidad, ¿En cuántos barriles aumenta la demanda de gasolina?",style={'margin-top': '20px'}),
+                dcc.Input(id='input-publicidad', type='number', placeholder='Ingrese la cantidad', min=0)
+        ]), 
+        dbc.Row([
+            html.H6("")
+        ]),
+        dbc.Row([
+            dbc.Col(dbc.Button("OPTIMIZAR", id='boton-optimizar', color="primary", className="text-center"))
+        ], className="text-center"),
+
+    ])
 ])
 
-# Definir el diseño de la página 2
-pagina_2_layout = html.Div([
-    
-    # Contenido de la página 2
-    html.Div([
-        html.P("A continuación, ingrese los detalles necesarios para cada tipo de gasolina y crudo."),
-        html.Table(id='tabla-precios-gasolina'),
-        html.Table(id='tabla-cantidad-gasolina'),
-        html.Table(id='tabla-indice-octano-azufre'),
-        html.Table(id='tabla-gasolina-octano-azufre'),
-        html.Table(id='tabla-cantidad-crudo'),
-    ], style={'margin-top': '20px'
-    
-    }),
-
-    # Botón "Enviar"
-    html.Div([
-        html.Button('Enviar', id='btn-enviar-datos', n_clicks=0, style={'margin-top': '20px', 'padding': '10px 20px'}),
-    ]),
-
-    # Contenedor para las gráficas
-    #html.Div(id='graficas-container')
-    html.Div( id='graficas-container')
+resultado_layout = html.Div([
+    html.H1("RESULTADOS", className= "text-center"),
+    html.Div(id='resultado', children=[])
 ])
 
-
-# Definir el diseño de la aplicación (contiene las páginas 1 y 2)
-app.layout = html.Div([
-    dcc.Store(id='store-cantidad-gasolina'),
-    dcc.Store(id='store-cantidad-crudo'),
-    dcc.Store(id='store-restricciones', data=[]),
-    dcc.Store(id='store-precios-gasolina', data=[]),
-    dcc.Store(id='store-precio-crudo', data=[]),
-    dcc.Store(id='store-cantidad-barriles', data=[]),
-    dcc.Store(id='store-min-octano', data=[]),
-    dcc.Store(id='store-max-azufre', data=[]),
-    dcc.Store(id='store-indice-octano', data=[]),
-    dcc.Store(id='store-porcentaje-azufre', data=[]),
-    dcc.Store(id='store-funct'),
-
-    # Selector de páginas
-    dcc.Tabs(id='tabs', value='pagina-1', children=[
-        dcc.Tab(label='Datos iniciales', value='pagina-1'),
-        dcc.Tab(label='Tablas/Resultados', value='pagina-2'),
-    ]),
-    
-    # Contenedor para mostrar el contenido de la página seleccionada
-    html.Div(id='page-content', children=pagina_1_layout)
-])
-
-# Callback para actualizar el contenido de la página según la pestaña seleccionada
+# Callback para generar las tablas 
 @app.callback(
-    Output('page-content', 'children'),
-    [Input('tabs', 'value')]
+    [Output('tablas-precio-crudo', 'children'),
+     Output('tablas-precio-gasolina', 'children'),
+     Output('tablas-caracteristicas-crudo', 'children'),
+     Output('tablas-caracteristicas-gasolina', 'children'),
+     Output('tablas-cantidad-gasolina', 'children')],
+    [Input('cantidad-crudo', 'value'),
+     Input('cantidad-gasolina', 'value')]
 )
-# Se encarga de mostrar la página correcta. 
-def display_page(tab):
-    if tab == 'pagina-1':
-        return pagina_1_layout
-    elif tab == 'pagina-2':
-        return pagina_2_layout
-    else:
-        return html.Div()
 
-# Callback para almacenar las cantidades de gasolina y crudo
+# Función para generar las tablas
+def actualizar_tablas(cantidad_crudo, cantidad_gasolina):
+    tablas_precio_crudo = generar_tabla_crudo(cantidad_crudo)
+    tablas_precio_gasolina = generar_tabla_gasolina(cantidad_gasolina)
+    tablas_caracteristicas_crudo = generar_tabla_crudo_caracteristicas(cantidad_crudo)
+    tablas_caracteristicas_gasolina = generar_tabla_gasolina_octano_azufre(cantidad_gasolina)
+    tablas_cantidad_gasolina = generar_tablag(cantidad_gasolina)
+
+    return tablas_precio_crudo, tablas_precio_gasolina, tablas_caracteristicas_crudo, tablas_caracteristicas_gasolina, tablas_cantidad_gasolina
+
+# Callback para proceso de optimización 
 @app.callback(
-    Output('store-cantidad-gasolina', 'data'),
-    Output('store-cantidad-crudo', 'data'),
-    [Input('btn-siguiente', 'n_clicks')],
-    [State('input-cantidad-gasolina', 'value'),
-     State('input-cantidad-crudo', 'value')]
-)
-def store_cantidad_gasolina_y_crudo(n_clicks, cantidad_gasolina, cantidad_crudo):
-    if n_clicks > 0 and cantidad_gasolina and cantidad_crudo:
-        return cantidad_gasolina, cantidad_crudo
-    return dash.no_update, dash.no_update
-
-# Callback para generar las tablas de la página 2
-@app.callback(
-    Output('tabla-precios-gasolina', 'children'),
-    Output('tabla-cantidad-gasolina', 'children'),
-    Output('tabla-indice-octano-azufre', 'children'),
-    Output('tabla-gasolina-octano-azufre', 'children'),
-    Output('tabla-cantidad-crudo', 'children'),
-    Input('store-cantidad-gasolina', 'data'),
-    Input('store-cantidad-crudo', 'data')
-)
-# Función para generar las tablas de la página 2
-def generar_tablas_pagina_2(data_gasolina, data_crudo):
-    if data_gasolina and data_crudo:
-        cantidad_gasolina = data_gasolina
-        cantidad_crudo = data_crudo
-        return (generar_tabla_gasolina(cantidad_gasolina),
-                generar_tabla_crudo(cantidad_crudo),
-                generar_tablag(cantidad_gasolina),
-                generar_tabla_gasolina_octano_azufre(cantidad_gasolina),
-                generar_tabla_crudo_caracteristicas(cantidad_crudo))
-    return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
-
-
-#Callback para hacer el proceso de optimzacion y crear las gráficas
-@app.callback(
-    Output('graficas-container', 'children'),
-    [Input('btn-enviar-datos', 'n_clicks')],
-    [State({'type': 'precio-gasolina', 'index': ALL}, 'value'),
-    State({'type': 'precio-crudo', 'index': ALL}, 'value'),
-    State({'type': 'cantidad-barriles', 'index': ALL}, 'value'),
-    State({'type': 'min-octano', 'index': ALL}, 'value'),
-    State({'type': 'max-azufre', 'index': ALL}, 'value'),
-    State({'type': 'indice-octano', 'index': ALL}, 'value'),
-    State({'type': 'porcentaje-azufre', 'index': ALL}, 'value'),
-    State('store-cantidad-gasolina', 'data'),
-    State('store-cantidad-crudo', 'data'),
-    State('store-restricciones', 'data'),]
+    Output('grafs', 'data'),
+    [Input('boton-optimizar', 'n_clicks')],
+    [State({'type': 'precio-crudo', 'index': ALL}, 'value'),
+     State({'type': 'precio-gasolina', 'index': ALL}, 'value'),
+     State({'type': 'cantidad-barriles', 'index': ALL}, 'value'),
+     State({'type': 'min-octano', 'index': ALL}, 'value'),
+     State({'type': 'max-azufre', 'index': ALL}, 'value'),
+     State({'type': 'indice-octano', 'index': ALL}, 'value'),
+     State({'type': 'porcentaje-azufre', 'index': ALL}, 'value'),
+     State('cantidad-crudo', 'value'),
+     State('cantidad-gasolina', 'value'),
+     State('input-max-compra-barriles', 'value'),
+     State('input-costo-transformacion', 'value'),
+     State('input-max-produccion-gasolina', 'value'),
+     State('input-publicidad', 'value'),]
 )
 
 # Función que realiza los procesos principales de optimización y gráficas
 
-def store_valores(n_clicks, valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_oc, azufre_cru, cantidad_gasolina, cantidad_crudo, restricciones):
-    if n_clicks > 0:
+def store_valores(n_clicks, valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_oc, azufre_cru, cantidad_gasolina, cantidad_crudo, max_compra_barriles, costo_trans, max_prod_gasolina, publi):
+    if n_clicks is not None and n_clicks>0 and cantidad_gasolina is not None and cantidad_crudo is not None and max_compra_barriles is not None and costo_trans is not None and max_prod_gasolina is not None and publi is not None:
+        restricciones = []
+        restricciones.append(max_compra_barriles)
+        restricciones.append(costo_trans)
+        restricciones.append(max_prod_gasolina)
+        restricciones.append(publi)
         nombres, valores, optimo = opti(valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_oc, azufre_cru, cantidad_gasolina, cantidad_crudo, restricciones)
         graficos =[]
+        graficos.append(
+            dbc.Card(
+                dbc.CardBody([
+                    html.H3(f'Las ganancias máximas de la empresa son de:  {optimo} dólares'), html.H6("")
+                ]),
+                className="mb-11"  # Puedes ajustar las clases de estilo según sea necesario
+            )
+        )
         for j in range(1, cantidad_gasolina+1):
             nombres_grafica = []
             valores_grafica = []
@@ -377,7 +336,9 @@ def store_valores(n_clicks, valores_precios_gasolina, precio_b, cantidad_b, min_
             # Utilizar un identificador único para cada gráfica
             graph_id = f'grafica-{i}'
             graph = dcc.Graph(id=graph_id, figure=graficas(nombres_grafica, valores_grafica))
-            graficos.append(html.Div([html.H3(f'Gráfica gasolina tipo {j}'), graph]))
+            graficos.append(html.Div([html.H3(f'Gasolina tipo {j}'), 
+                                      html.H6(f'La cantidad de barriles por cada tipo de crudo que debería invertir la empresa para producir gasolina tipo {j} es: '),
+                                      graph]))
         
         nombres_grafica2 = []
         valores_grafica2 = []
@@ -388,35 +349,40 @@ def store_valores(n_clicks, valores_precios_gasolina, precio_b, cantidad_b, min_
 
         graph_id = f'grafica-{cantidad_gasolina+1}'
         graph = dcc.Graph(id=graph_id, figure=graficas2(nombres_grafica2, valores_grafica2))
-        graficos.append(html.Div([html.H3(f'Gráfica Publicidad'), graph]))
-
-        graficos.append(html.Div([html.H3(f'El valor de la función objetivo en el óptimo es: {optimo}')]))
-
+        graficos.append(
+            html.Div([html.H3(f'Inversión publicidad'),
+                      html.H6(f'La cantidad de dólares que la empresa debería invertir por cada tipo de gasolina es:'),
+                       graph]))  
         return graficos
+    
     return dash.no_update
 
-# Callback para cambiar a la página 2 cuando se haga clic en el botón "Siguiente"
 @app.callback(
-    Output('tabs', 'value'),
-    Output('store-restricciones', 'data'),
-    [Input('btn-siguiente', 'n_clicks')],
-    [State('input-cantidad-gasolina', 'value'),
-     State('input-cantidad-crudo', 'value'),
-     State('input-max-compra-barriles', 'value'),
-     State('input-costo-transformacion', 'value'),
-     State('input-max-produccion-gasolina', 'value'),
-     State('input-publicidad', 'value')]
+    Output('resultado', 'children'),
+    Input('url', 'pathname'),
+    State('grafs', 'data')
 )
+def pasar_grafos(path, grafs):
+    if grafs is not None and path == "/page-1":
+        return grafs
+    
 
-# Validación de que ya se hayan digitados todos los valores para poder pasar a la página 2.
+@app.callback(
+    Output("page-content", "children"),
+    Input("url", "pathname")
+)
+def render_page_content(pathname):
+    if pathname == "/":
+        return introducir_datos_layout
+    elif pathname == "/page-1":
+        return resultado_layout
+    return html.Div(
+        [
+            html.H1("404: Not found", className="text-danger"),
+            html.Hr(),
+            html.P(f"The pathname {pathname} was not recognized..."),
+        ]
+    )
 
-def cambiar_pagina(n_clicks, cantidad_gasolina, cantidad_crudo, max_compra_barriles, costo_transformacion, max_produccion_gasolina, publicidad):
-    if n_clicks > 0 and cantidad_gasolina is not None and cantidad_crudo is not None and max_compra_barriles is not None and costo_transformacion is not None and max_produccion_gasolina is not None and publicidad is not None:
-        rests = [max_compra_barriles, costo_transformacion, max_produccion_gasolina, publicidad]
-        return 'pagina-2', rests
-    return dash.no_update, dash.no_update
-
-# Ejecutar la aplicación
-
-if __name__ == '__main__':
-    app.run_server(debug = True) # Debug = True: la aplicación se recargará automáticamente cuando se hagan cambios en el código fuente.
+if __name__ == "__main__":
+    app.run_server(debug=True)
