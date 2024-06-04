@@ -160,7 +160,7 @@ SIDEBAR_STYLE = {
     "top": 0,
     "left": 0,
     "bottom": 0,
-    "width": "11rem",
+    "width": "12rem",
     "padding": "2rem 1rem",
     "background-color": "#212f3d",
 }
@@ -178,11 +178,11 @@ FOOTER_STYLE = {
     "position": "fixed",
     "bottom": 0,
     "left": 0,
-    "width": "100%",
+    "width": "12rem",
     "padding": "1rem",
     "background-color": "#212f3d",
     "color": "white",
-    "text-align": "center",
+
 }
 
 sidebar = html.Div(
@@ -198,7 +198,7 @@ sidebar = html.Div(
             pills=True,
         ),
          # Contenido del pie de página
-        html.Footer("© 2024 Blendek Inc.", style=FOOTER_STYLE)
+        html.Footer("By: Kanery Camargo y Emanuel Carbonell", style=FOOTER_STYLE)
     ],
     style=SIDEBAR_STYLE,
 )
@@ -321,9 +321,9 @@ def store_valores(n_clicks, valores_precios_gasolina, precio_b, cantidad_b, min_
         graficos.append(
             dbc.Card(
                 dbc.CardBody([
-                    html.H3(f'Las ganancias máximas de la empresa son de:  {optimo} dólares'), html.H6("")
+                    html.H3(f'Las ganancias máximas de la empresa son: {optimo}')
                 ]),
-                className="mb-11"  # Puedes ajustar las clases de estilo según sea necesario
+                className="mb-3"  # Puedes ajustar las clases de estilo según sea necesario
             )
         )
         for j in range(1, cantidad_gasolina+1):
