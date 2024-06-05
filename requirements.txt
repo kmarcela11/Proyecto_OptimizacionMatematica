@@ -1,7 +1,11 @@
-import dash
-from dash import dcc, html
-from dash.dependencies import Input, Output, State, ALL
-import dash_bootstrap_components as dbc
-from pulp import *
-import plotly.graph_objects as go
+dash==2.14.1
+dash-bootstrap-components==1.6.0
+dash-core-components==2.0.0
+dash-html-components==2.0.0
+dash-table==5.0.0
+Flask==3.0.0
+pandas==2.1.2
+plotly==5.18.0
+plotly-express==0.4.1
+PuLP==2.8.0
 gunicorn
