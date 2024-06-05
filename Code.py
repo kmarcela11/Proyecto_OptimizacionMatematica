@@ -129,7 +129,6 @@ def opti(valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_
         nombres.append(v.name)
         valores.append(v.varValue)
 
-    resultados = (f"El valor de la función objetivo en el óptimo es: {problema.objective.value()}")
 
     return nombres, valores, problema.objective.value()
     
@@ -309,7 +308,7 @@ def actualizar_tablas(cantidad_crudo, cantidad_gasolina):
 
 # Función que realiza los procesos principales de optimización y gráficas
 
-def store_valores(n_clicks, valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_oc, azufre_cru, cantidad_gasolina, cantidad_crudo, max_compra_barriles, costo_trans, max_prod_gasolina, publi):
+def store_valores(n_clicks, precio_b, valores_precios_gasolina,  cantidad_b, min_oc, max_az, indice_oc, azufre_cru,cantidad_crudo, cantidad_gasolina,  max_compra_barriles, costo_trans, max_prod_gasolina, publi):
     if n_clicks is not None and n_clicks>0 and cantidad_gasolina is not None and cantidad_crudo is not None and max_compra_barriles is not None and costo_trans is not None and max_prod_gasolina is not None and publi is not None:
         restricciones = []
         restricciones.append(max_compra_barriles)
@@ -321,7 +320,7 @@ def store_valores(n_clicks, valores_precios_gasolina, precio_b, cantidad_b, min_
         graficos.append(
             dbc.Card(
                 dbc.CardBody([
-                    html.H3(f'Las ganancias máximas de la empresa son: {optimo}')
+                    html.H3(f'Las ganancias máximas de la empresa son: {optimo} dólares')
                 ]),
                 className="mb-3"  # Puedes ajustar las clases de estilo según sea necesario
             )
