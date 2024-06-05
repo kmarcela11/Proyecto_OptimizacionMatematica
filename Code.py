@@ -9,7 +9,7 @@ import plotly.graph_objects as go
 # Crear la aplicación Dash
 app = dash.Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.FLATLY])
 
-server = app.server()
+server = app.server
 def generar_tabla_gasolina(cantidad_gasolina):
     header = [html.Tr([html.Th("Tipo de gasolina"), html.Th("Precio de venta por barril")])]
     rows = [html.Tr([html.Td(f"Tipo {i+1}"), html.Td(dcc.Input(id={'type': 'precio-gasolina', 'index': i+1}, type='number', placeholder='Ingrese el precio', min=0))]) for i in range(cantidad_gasolina)]
