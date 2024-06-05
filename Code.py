@@ -236,19 +236,20 @@ introducir_datos_layout = html.Div([
             dbc.Col(html.Div(id='tablas-caracteristicas-crudo', children=[]))
         ], className="mb-2"),
         dbc.Row([
-            html.H6("¿Cuál es la cantidad máxima de compra de barriles de petróleo crudo por día de su empresa?", style={'margin-top': '20px'}),
+            html.H6("¿Cuál es la cantidad máxima de compra de barriles de petróleo crudo por día de la empresa?", style={'margin-top': '20px'}),
                 dcc.Input(id='input-max-compra-barriles', type='number', placeholder='Ingrese la cantidad', min=0)
         ]), 
+
         dbc.Row([
-            html.H6("¿Cuánto cuesta transformar un barril de petróleo crudo a gasolina? (Dólares)", style={'margin-top': '20px'}),
+            html.H6("¿Cuál es la cantidad máxima de barriles de gasolina que puede producir la empresa diariamente?", style={'margin-top': '20px'}),
+                dcc.Input(id='input-max-produccion-gasolina', type='number', placeholder='Ingrese la cantidad', min=0)
+        ]), 
+                dbc.Row([
+            html.H6("¿Cuánto cuesta transformar un barril de petróleo crudo a un barril de gasolina? (Dólares)", style={'margin-top': '20px'}),
                  dcc.Input(id='input-costo-transformacion', type='number', placeholder='Ingrese el costo', min=0)
         ]), 
         dbc.Row([
-            html.H6("¿Cuál es la cantidad máxima de barriles de gasolina que puede producir diariamente?", style={'margin-top': '20px'}),
-                dcc.Input(id='input-max-produccion-gasolina', type='number', placeholder='Ingrese la cantidad', min=0)
-        ]), 
-        dbc.Row([
-            html.H6("Si su empresa invierte un dólar en publicidad, ¿En cuántos barriles aumenta la demanda de gasolina?",style={'margin-top': '20px'}),
+            html.H6("Si la empresa invierte un dólar en publicidad, ¿En cuántos barriles aumenta la demanda de barriles de gasolina?",style={'margin-top': '20px'}),
                 dcc.Input(id='input-publicidad', type='number', placeholder='Ingrese la cantidad', min=0)
         ]), 
         dbc.Row([
@@ -317,14 +318,16 @@ def store_valores(n_clicks, precio_b, valores_precios_gasolina,  cantidad_b, min
         restricciones.append(publi)
         nombres, valores, optimo = opti(valores_precios_gasolina, precio_b, cantidad_b, min_oc, max_az, indice_oc, azufre_cru, cantidad_gasolina, cantidad_crudo, restricciones)
         graficos =[]
-        graficos.append(
-            dbc.Card(
-                dbc.CardBody([
-                    html.H3(f'Las ganancias máximas de la empresa son: {optimo} dólares')
-                ]),
-                className="mb-3"  # Puedes ajustar las clases de estilo según sea necesario
-            )
+        graficos.append(html.Div([ 
+        html.H4(f'  '), html.H6("")]))
+        graficos.append(dbc.Card(
+            dbc.CardBody([
+                html.H3(f'La ganancia máxima de la empresa es igual a: ${optimo}')
+            ]),      
+            style={'backgroundColor': '#17202A', 'color': '#fff', 'borderRadius': '10px','textAlign': 'center', 'width': '880px'},
+            className="text-center")
         )
+        graficos.append(html.H6(""))
         for j in range(1, cantidad_gasolina+1):
             nombres_grafica = []
             valores_grafica = []
